@@ -1,16 +1,22 @@
 FROM ubuntu:trusty
 
 RUN apt-get update \
-  && apt-get install --no-install-recommends -y ca-certificates wget \
+  && apt-get install --no-install-recommends -y \
+      ca-certificates iproute2 git lsb-release python-pip \
   && apt-get autoremove  \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*cache.bin
 
-RUN wget -O devstack.pkglist https://raw.githubusercontent.com/openstack-dev/devstack/master/files/debs/general \
-  && perl -pe 's!\#.*!!g' devstack.pkglist > devstack.pkglist.nocomments
+RUN git clone --branch master --depth=1 \
+  https://github.com/openstack-dev/devstack
 
 RUN apt-get update \
-  && apt-get install --no-install-recommends -y $(cat devstack.pkglist.nocomments) \
+  && cd devstack \
+  && tools/install_prereqs.sh \
   && apt-get autoremove  \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*cache.bin
+
+RUN pip install -U pip \
+  && pip install virtualenv \
+  && virtualenv /venv
