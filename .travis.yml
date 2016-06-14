@@ -1,0 +1,12 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t docker-os-config/xenial xenial
+  - docker run docker-os-config/xenial /bin/sh -c 'ls -al'
+  - docker ps -a
+
+script:
+  - ls -al
